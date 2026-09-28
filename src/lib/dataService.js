@@ -184,10 +184,20 @@ export async function getDocuments(moduleCode = null, tag = null) {
 
 export async function uploadDocument({ file, moduleCode, tag, title }) {
   if (isSupabaseConfigured()) {
+    // Sanitiser une chaîne pour l'utiliser comme clé Supabase Storage
+    // → supprime les accents, remplace les caractères non-ASCII par '_'
+    const sanitize = (str) =>
+      str
+        .normalize('NFD')                      // décompose les accents (é → e + ́)
+        .replace(/[\u0300-\u036f]/g, '')       // supprime les diacritiques
+        .replace(/[^a-zA-Z0-9._\-/]/g, '_')   // remplace tout autre caractère spécial
+        .replace(/-/g, '_');                   // remplace les tirets (invalides dans certains chemins)
+
     // 1. Upload dans Supabase Storage
     const fileExt = file.name.split('.').pop();
-    const cleanFileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-    const filePath = `${moduleCode}/${cleanFileName}`;
+    const cleanFileName = sanitize(`${Date.now()}_${file.name.replace(/\s+/g, '_')}`);
+    const safeModuleCode = sanitize(moduleCode);
+    const filePath = `${safeModuleCode}/${cleanFileName}`;
 
     const { error: uploadError } = await supabase.storage
       .from('documents')
