@@ -48,11 +48,12 @@ export default function AdminView({
   const [authError, setAuthError] = useState(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  // Report form state
+  // Report form state — cascading: module → session → week
+  const [reportModuleCode, setReportModuleCode] = useState(modules[0]?.module_code || '');
   const [selectedSessionId, setSelectedSessionId] = useState('');
-  const [originalWeek, setOriginalWeek] = useState(3);
+  const [originalWeek, setOriginalWeek] = useState(1);
   const [actionType, setActionType] = useState('reported'); // 'reported' or 'cancelled'
-  const [newWeek, setNewWeek] = useState(4);
+  const [newWeek, setNewWeek] = useState(2);
   const [newDay, setNewDay] = useState('lundi');
   const [newDate, setNewDate] = useState('');
   const [newStartTime, setNewStartTime] = useState('08:30');
@@ -114,17 +115,30 @@ export default function AdminView({
     return map;
   }, [modules]);
 
-  // Initialisation auto de la première session
-  React.useEffect(() => {
-    if (sessions.length > 0 && !selectedSessionId) {
-      setSelectedSessionId(sessions[0].id);
-      setNewStartTime(sessions[0].start_time);
-      setNewEndTime(sessions[0].end_time);
-      setNewRoom(sessions[0].room || '');
-      setNewDay(sessions[0].day);
-    }
+  // Sessions filtrées par module sélectionné
+  const sessionsForModule = React.useMemo(() => {
+    if (!reportModuleCode) return [];
+    return sessions.filter(s => s.module_code === reportModuleCode);
+  }, [sessions, reportModuleCode]);
+
+  // Semaines valides pour la séance sélectionnée
+  const weeksForSession = React.useMemo(() => {
+    const s = sessions.find(item => item.id === selectedSessionId);
+    if (!s) return Array.from({ length: 11 }, (_, i) => i + 1);
+    const from = s.week_from || 1;
+    const to = s.week_to || 11;
+    return Array.from({ length: to - from + 1 }, (_, i) => from + i);
   }, [sessions, selectedSessionId]);
 
+  // Quand le module change, reset la session
+  const handleReportModuleChange = (e) => {
+    const code = e.target.value;
+    setReportModuleCode(code);
+    setSelectedSessionId('');
+    setOriginalWeek(1);
+  };
+
+  // Quand la séance change, pré-remplir les champs
   const handleSessionChange = (e) => {
     const sId = e.target.value;
     setSelectedSessionId(sId);
@@ -134,6 +148,7 @@ export default function AdminView({
       setNewEndTime(s.end_time);
       setNewRoom(s.room || '');
       setNewDay(s.day);
+      setOriginalWeek(s.week_from || 1);
     }
   };
 
@@ -429,54 +444,88 @@ export default function AdminView({
         <h3>Marquer un Report ou une Annulation</h3>
 
         <form onSubmit={handleReportSubmit}>
+
+          {/* ÉTAPE 1 : Choisir le module */}
           <div className="form-group">
-            <label htmlFor="session-select">Séance concernée</label>
+            <label htmlFor="report-module-select">① Module concerné</label>
             <select
-              id="session-select"
+              id="report-module-select"
               className="form-control"
-              value={selectedSessionId}
-              onChange={handleSessionChange}
+              value={reportModuleCode}
+              onChange={handleReportModuleChange}
               required
             >
-              {sessions.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.module_code} · {s.day.toUpperCase()} ({s.start_time}-{s.end_time})
-                  {s.student_group ? ` [${s.student_group}]` : ' [Tous]'} · Semaines {s.week_from} à {s.week_to}
+              <option value="">— Sélectionner un module —</option>
+              {modules.map(m => (
+                <option key={m.module_code} value={m.module_code}>
+                  {m.name}
                 </option>
               ))}
             </select>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {/* ÉTAPE 2 : Choisir la séance du module */}
+          {reportModuleCode && (
             <div className="form-group">
-              <label htmlFor="origin-week">Semaine de la séance à modifier</label>
-              <select
-                id="origin-week"
-                className="form-control"
-                value={originalWeek}
-                onChange={e => setOriginalWeek(Number(e.target.value))}
-              >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(w => (
-                  <option key={w} value={w}>Semaine {w}</option>
-                ))}
-              </select>
+              <label htmlFor="session-select">② Séance du module</label>
+              {sessionsForModule.length === 0 ? (
+                <div style={{ fontSize: '0.75rem', opacity: 0.6, padding: '6px 0' }}>
+                  Aucune séance trouvée pour ce module.
+                </div>
+              ) : (
+                <select
+                  id="session-select"
+                  className="form-control"
+                  value={selectedSessionId}
+                  onChange={handleSessionChange}
+                  required
+                >
+                  <option value="">— Choisir une séance —</option>
+                  {sessionsForModule.map(s => (
+                    <option key={s.id} value={s.id}>
+                      {s.session_type?.toUpperCase() || 'COURS'} · {s.day.charAt(0).toUpperCase() + s.day.slice(1)} {s.start_time}–{s.end_time}
+                      {s.student_group ? ` · Gr: ${s.student_group}` : ' · Tous groupes'}
+                      {` · Sem ${s.week_from}→${s.week_to}`}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
+          )}
 
-            <div className="form-group">
-              <label htmlFor="action-type">Type d'action</label>
-              <select
-                id="action-type"
-                className="form-control"
-                value={actionType}
-                onChange={e => setActionType(e.target.value)}
-              >
-                <option value="reported">🗓️ Reporter la séance (Rattrapage)</option>
-                <option value="cancelled">🚫 Annuler purement la séance</option>
-              </select>
+          {/* ÉTAPE 3 : Semaine + Action (visible seulement quand une séance est choisie) */}
+          {selectedSessionId && (
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="form-group">
+                <label htmlFor="origin-week">③ Semaine à modifier</label>
+                <select
+                  id="origin-week"
+                  className="form-control"
+                  value={originalWeek}
+                  onChange={e => setOriginalWeek(Number(e.target.value))}
+                >
+                  {weeksForSession.map(w => (
+                    <option key={w} value={w}>Semaine {w}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="action-type">④ Type d'action</label>
+                <select
+                  id="action-type"
+                  className="form-control"
+                  value={actionType}
+                  onChange={e => setActionType(e.target.value)}
+                >
+                  <option value="reported">🗓️ Reporter la séance (Rattrapage)</option>
+                  <option value="cancelled">🚫 Annuler purement la séance</option>
+                </select>
+              </div>
             </div>
-          </div>
+          )}
 
-          {actionType === 'reported' && (
+          {selectedSessionId && actionType === 'reported' && (
             <div style={{ background: 'var(--paper)', padding: 12, borderRadius: 6, border: '1.5px dashed var(--ink)', marginBottom: 14 }}>
               <div style={{ fontWeight: 800, fontSize: '0.8rem', marginBottom: 8, fontFamily: 'var(--font-meta)' }}>
                 Destination du rattrapage (détection automatique de conflit) :
@@ -577,7 +626,12 @@ export default function AdminView({
             />
           </div>
 
-          <button type="submit" className="btn-primary" disabled={isSubmittingReport}>
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={isSubmittingReport || !selectedSessionId}
+            style={{ opacity: !selectedSessionId ? 0.5 : 1 }}
+          >
             {isSubmittingReport ? 'Vérification & Enregistrement...' : 'Enregistrer la modification'}
           </button>
         </form>
