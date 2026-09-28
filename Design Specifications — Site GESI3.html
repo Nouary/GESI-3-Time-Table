@@ -1,0 +1,298 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}</style><style>:root{color-scheme:light dark;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])){--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}}:root[data-theme="dark"]{color-scheme:dark;--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}:root[data-theme="light"]{color-scheme:light}@media print{:root,:root[data-theme="dark"]{color-scheme:light;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}}body{background:var(--md-bg);color:var(--md-text);max-width:720px;margin:0 auto;padding:32px;display:flex;flex-direction:column;gap:10px;font:14px/1.55 -apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif;overflow-wrap:break-word}body>:first-child{margin-top:0}h1,h2,h3,h4,h5,h6{margin:6px 0 0;line-height:1.25;font-weight:600;text-wrap:balance}h1{font-size:1.35em}h2{font-size:1.15em;color:var(--md-muted)}h3,h4,h5,h6{font-size:1em}p,ul,ol,blockquote,table,pre,hr{margin:0}strong{font-weight:600}a{color:var(--md-link);text-decoration:none}a:hover{text-decoration:underline}ul,ol{display:flex;flex-direction:column;gap:6px;padding-left:22px}ul{list-style:disc}ol{list-style:decimal}:is(li,td,th)>*+:is(p,ul,ol,blockquote){margin-top:6px}blockquote{display:flex;flex-direction:column;gap:10px;border-left:2px solid var(--md-rule);padding-left:10px;color:var(--md-muted)}:not(pre)>code{background:var(--md-fill);padding:1px 3px;border-radius:4px;font:.92em 'SF Mono',ui-monospace,Menlo,Consolas,monospace}a>code{background:none;color:inherit}pre{background:var(--md-fill);padding:10px 12px;border-radius:6px;overflow-x:auto;font:12px/1.5 'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-block:4px}pre code{background:none;padding:0;font:inherit}table{width:100%;border-collapse:separate;border-spacing:2px;font:inherit}th,td{padding:6px 8px;border-radius:3px;text-align:left;vertical-align:top}th{background:var(--md-fill-strong);font-weight:600}td{background:var(--md-fill)}:is(th,td) :not(pre)>code{background:transparent}hr{border:0;border-top:1px solid var(--md-rule-strong);margin-block:10px}img{max-width:100%;height:auto;border-radius:4px}</style>
+</head><body>
+<h1>Design Specifications — Site GESI3</h1>
+<p>Document de référence pour toute IA ou développeur reprenant ce projet. Couvre les 3 directions de style, leurs variantes clair/sombre, et la spécification de chaque composant.</p>
+<hr>
+<h2>1. Système de design : 3 directions interchangeables</h2>
+<p>Le site supporte 3 identités visuelles distinctes, sélectionnables en direct via un bouton &quot;Style&quot;, chacune disponible en clair et sombre (6 combinaisons totales). Le contenu et la structure HTML restent identiques ; seuls les styles CSS et quelques libellés changent.</p>
+<table>
+<thead>
+<tr>
+<th>Direction</th>
+<th>Esprit</th>
+<th>Polices</th>
+<th>Cas d'usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Zine Étudiant</strong> (défaut)</td>
+<td>Post-its, papier, décalage ludique</td>
+<td>Georgia (titres), système (corps), Courier New (métadonnées)</td>
+<td>Ambiance vie étudiante, chaleureuse</td>
+</tr>
+<tr>
+<td><strong>Éditorial Technique</strong></td>
+<td>Revue/rapport, lignes strictes</td>
+<td>Georgia (titres + corps), Courier New (métadonnées)</td>
+<td>Look sobre, professionnel</td>
+</tr>
+<tr>
+<td><strong>Terminal / Blueprint</strong></td>
+<td>Console, monospace</td>
+<td>Courier New (tout)</td>
+<td>Cohérent avec filière électrotechnique/systèmes</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>2. Palettes de couleurs</h2>
+<p>Chaque direction définit 5 variables : <code>--paper</code> (fond), <code>--card</code> (fond des blocs), <code>--ink</code> (texte/bordures), <code>--accent</code> (couleur primaire), <code>--accent2</code> (couleur secondaire), <code>--shadow</code> (couleur des ombres portées).</p>
+<h3>Zine Étudiant</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Clair</th>
+<th>Sombre</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--paper</code></td>
+<td><code>#fff7e8</code></td>
+<td><code>#1b140d</code></td>
+</tr>
+<tr>
+<td><code>--card</code></td>
+<td><code>#ffffff</code></td>
+<td><code>#2a2018</code></td>
+</tr>
+<tr>
+<td><code>--ink</code></td>
+<td><code>#241b12</code></td>
+<td><code>#f3e9d5</code></td>
+</tr>
+<tr>
+<td><code>--accent</code></td>
+<td><code>#e0553c</code></td>
+<td><code>#ff8266</code></td>
+</tr>
+<tr>
+<td><code>--accent2</code></td>
+<td><code>#5c8a5a</code></td>
+<td><code>#8fc088</code></td>
+</tr>
+<tr>
+<td><code>--shadow</code></td>
+<td><code>rgba(36,27,18,.9)</code></td>
+<td><code>rgba(0,0,0,.55)</code></td>
+</tr>
+</tbody>
+</table>
+<h3>Éditorial Technique</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Clair</th>
+<th>Sombre</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--paper</code></td>
+<td><code>#f3efe6</code></td>
+<td><code>#17150f</code></td>
+</tr>
+<tr>
+<td><code>--card</code></td>
+<td><code>#fffdf9</code></td>
+<td><code>#211f19</code></td>
+</tr>
+<tr>
+<td><code>--ink</code></td>
+<td><code>#1a1a17</code></td>
+<td><code>#f0ece0</code></td>
+</tr>
+<tr>
+<td><code>--accent</code></td>
+<td><code>#b23b2e</code></td>
+<td><code>#e2685a</code></td>
+</tr>
+<tr>
+<td><code>--accent2</code></td>
+<td><code>#5c6b4a</code></td>
+<td><code>#8aa06e</code></td>
+</tr>
+<tr>
+<td><code>--shadow</code></td>
+<td><code>rgba(26,26,23,.85)</code></td>
+<td><code>rgba(0,0,0,.6)</code></td>
+</tr>
+</tbody>
+</table>
+<h3>Terminal / Blueprint</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Clair</th>
+<th>Sombre</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--paper</code></td>
+<td><code>#eef2f0</code></td>
+<td><code>#081014</code></td>
+</tr>
+<tr>
+<td><code>--card</code></td>
+<td><code>#ffffff</code></td>
+<td><code>#0f1c18</code></td>
+</tr>
+<tr>
+<td><code>--ink</code></td>
+<td><code>#0c2b22</code></td>
+<td><code>#c9f5e0</code></td>
+</tr>
+<tr>
+<td><code>--accent</code></td>
+<td><code>#1f8f6b</code></td>
+<td><code>#4fd6a8</code></td>
+</tr>
+<tr>
+<td><code>--accent2</code></td>
+<td><code>#2f6fed</code></td>
+<td><code>#7bb0df</code></td>
+</tr>
+<tr>
+<td><code>--shadow</code></td>
+<td><code>rgba(12,43,34,.8)</code></td>
+<td><code>rgba(0,0,0,.6)</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Règle de bascule</strong> : la direction (<code>data-direction</code> sur <code>&lt;body&gt;</code>) et le mode (clair/sombre) sont indépendants — 3 × 2 = 6 rendus. Le mode par défaut suit <code>prefers-color-scheme</code>, avec override manuel persisté en <code>localStorage</code>.</p>
+<hr>
+<h2>3. Typographie</h2>
+<table>
+<thead>
+<tr>
+<th>Rôle</th>
+<th>Variable CSS</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Titres</td>
+<td><code>--font-head</code></td>
+<td><code>Georgia, serif</code> (Zine, Éditorial) / <code>'Courier New', monospace</code> (Terminal)</td>
+</tr>
+<tr>
+<td>Corps</td>
+<td><code>--font-body</code></td>
+<td><code>-apple-system, Helvetica, Arial, sans-serif</code></td>
+</tr>
+<tr>
+<td>Métadonnées (heures, dates, labels techniques)</td>
+<td><code>--font-meta</code></td>
+<td><code>'Courier New', monospace</code> (toutes directions)</td>
+</tr>
+</tbody>
+</table>
+<p>Tailles de référence : logo ~1.5rem (900), titres de jour ~1.1rem (700), titre de séance ~1rem (800), métadonnées ~0.68–0.75rem, tags ~0.62rem (majuscules, 800).</p>
+<hr>
+<h2>4. Composants</h2>
+<h3>4.1 Header</h3>
+<ul>
+<li>Logo du site : nom &quot;GESI3&quot;, style variant par direction (badge incliné pour Zine, soulignement épais pour Éditorial, préfixe <code>$</code> pour Terminal).</li>
+<li>Sous-titre : établissement + semestre + année.</li>
+<li><strong>Tampon date/semaine</strong> : pastille avec bordure pointillée, affiche <code>JJ/MM/AAAA · Semaine N</code>, synchronisée avec la navigation de semaine.</li>
+</ul>
+<h3>4.2 Dock de contrôle (droite, centré verticalement sur grand écran)</h3>
+<ul>
+<li><strong>Desktop (> 640px)</strong> : Position fixe <code>top:50%; right:14px; transform:translateY(-50%)</code>. Conteneur arrondi (<code>border-radius:16px</code>) avec ombre portée dure, fond <code>--card</code>, bordure <code>--ink</code>. Le contenu garde une marge droite (~90px).</li>
+<li><strong>Mobile (≤ 640px)</strong> : Le contenu reprend sa pleine largeur centrée (marge droite normale de 16px). Le dock s'adapte sous forme de barre flottante discrète ou tiroir compact pour éviter de compresser la grille d'emploi du temps.</li>
+<li>3 boutons de direction empilés verticalement, chacun avec icône courte (Éd/Tm/Zn) + libellé complet en dessous ; le bouton actif est rempli avec <code>--accent</code>.</li>
+<li>Séparateur fin (<code>opacity:.2</code>).</li>
+<li>Bouton thème (icône soleil/lune + libellé &quot;Thème&quot;) en bas du dock.</li>
+</ul>
+<h3>4.3 Onglets (Planning / Documents)</h3>
+<p>Libellés adaptés par direction :</p>
+<table>
+<thead>
+<tr>
+<th>Direction</th>
+<th>Onglet 1</th>
+<th>Onglet 2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zine</td>
+<td>📌 Planning</td>
+<td>📎 Documents</td>
+</tr>
+<tr>
+<td>Éditorial</td>
+<td>01 — Planning</td>
+<td>02 — Documents</td>
+</tr>
+<tr>
+<td>Terminal</td>
+<td><code>&gt; planning</code></td>
+<td><code>&gt; docs</code></td>
+</tr>
+</tbody>
+</table>
+<h3>4.4 Navigateur de semaine</h3>
+<ul>
+<li>Bandeau avec bouton ‹ / numéro de semaine / bouton › ; bornes 1 à 11.</li>
+<li>Boutons circulaires (Zine/Éditorial) ou carrés arrondis (Terminal).</li>
+</ul>
+<h3>4.5 Carte de séance</h3>
+<p>Composant central du planning, avec <strong>3 variantes visuelles selon la direction</strong> (même structure HTML : heure, nom du module, tag(s)) :</p>
+<ul>
+<li><strong>Zine</strong> : &quot;post-it&quot; — fond <code>--card</code>, bordure 2px <code>--ink</code>, ombre dure décalée, légère rotation aléatoire (±1–1.2deg), petit ruban &quot;washi tape&quot; décoratif en haut.</li>
+<li><strong>Éditorial</strong> : ligne de tableau — pas de rotation ni d'ombre, bordure gauche 4px <code>--accent</code>, séparateur bas 1px, pas de washi tape.</li>
+<li><strong>Terminal</strong> : bloc console — bordure 1px <code>--accent2</code>, coins arrondis 4px, préfixe <code>&gt;</code> devant l'heure, police monospace.</li>
+</ul>
+<h3>4.6 Tags de séance et états de report / annulation</h3>
+<p>Badge coloré (fond plein, texte blanc, majuscules, arrondi 3px) :</p>
+<ul>
+<li>Type régulier : <code>Cours</code>, <code>TD</code>, <code>Cours+TD</code>, <code>TP</code>, <code>Activité Pratique</code>.</li>
+<li>Séance reportée : fond <code>--accent</code> avec mention <code>Reporté en Semaine [N]</code> (et date si connue).</li>
+<li>Séance annulée : fond rouge sombre avec mention <code>Séance Annulée</code>.</li>
+<li>Séance de rattrapage injectée : badge <code>Rattrapage (Semaine [N])</code>.</li>
+</ul>
+<h3>4.7 Chips de matière</h3>
+<ul>
+<li>Affichées <strong>toutes en même temps, sans défilement horizontal</strong> (<code>flex-wrap:wrap</code>, pas de scroll).</li>
+<li>Libellés = noms regroupés par module parent (Smart Grids, Véhicule, Énergie Multisources, Confort / Dimensionnement, Langues, Management, Audit Énergétique).</li>
+<li>Chip active : fond <code>--accent</code>, texte blanc.</li>
+</ul>
+<h3>4.8 Filtres de documents</h3>
+<p>Petits chips pilule (<code>border-radius:999px</code>) : Tous / Cours / TD / Correction TD / TP / Autre. Actif = fond <code>--ink</code>, texte <code>--paper</code>.</p>
+<h3>4.9 Carte de document</h3>
+<p>Même logique de variantes que la carte de séance (post-it / ligne éditoriale / bloc terminal). Contenu : tag, titre, métadonnées (type de fichier, taille, date d'ajout), lien de téléchargement direct.</p>
+<hr>
+<h2>5. Interactions et état</h2>
+<ul>
+<li>Changement de direction : instantané, purement CSS (variables + attribut <code>data-direction</code>), pas de rechargement.</li>
+<li>Changement de thème clair/sombre : bascule <code>mode</code>, persisté dans <code>localStorage</code>, valeur par défaut = préférence système.</li>
+<li>Navigation semaine : état JS simple (<code>week</code>, borné 1–11), répercuté sur le tampon d'en-tête et le bandeau de navigation.</li>
+<li>Sélection de matière / filtre de tag : état visuel réactif connecté aux tables Supabase <code>modules</code> et <code>documents</code>.</li>
+</ul>
+<hr>
+<h2>6. Accessibilité et responsive</h2>
+<ul>
+<li>Cible principale : mobile, layout en une colonne, <code>max-width:640px</code> centré.</li>
+<li>Sur mobile (écran &le; 640px) : retrait du padding-right forcé de 90px pour garder l'espace de lecture optimal.</li>
+<li>Respect des zones sûres iOS (<code>env(safe-area-inset-*)</code>).</li>
+<li>Contraste : chaque palette a été choisie pour garder <code>--ink</code> sur <code>--paper</code>/<code>--card</code> lisible en clair et en sombre.</li>
+<li>Tous les boutons de contrôle ont un <code>title</code> explicite pour les lecteurs d'écran.</li>
+</ul>
+<hr>
+<h2>7. Connexion aux données réelles</h2>
+<p>Cette spécification est branchée sur le modèle de données finalisé défini dans <code>technique.md</code> et le script <code>supabase_setup.sql</code> :</p>
+<ul>
+<li>Table <code>modules</code> : gestion des parents (ex: M354 regroupant Confort et Dimensionnement) pour les chips.</li>
+<li>Table <code>sessions</code> : emploi du temps officiel S1..S11 (cours, td, tp, ap, groupes Gr1/Gr2).</li>
+<li>Table <code>reports</code> : gestion des reports avec <code>new_week</code> et support des annulations (<code>status in ('reported', 'cancelled')</code>).</li>
+<li>Table <code>documents</code> : fichiers partagés avec <code>file_path</code> synchronisé avec le bucket Supabase Storage pour suppression complète.</li>
+</ul>
+
+</body></html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GESI3 — Maquette</title>
+<style>
+  :root{
+    --paper:#fff7e8; --card:#ffffff; --ink:#241b12; --accent:#e0553c; --accent2:#5c8a5a;
+    --shadow:rgba(36,27,18,.9);
+    --font-head:Georgia,serif; --font-body:-apple-system,Helvetica,Arial,sans-serif; --font-meta:'Courier New',monospace;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box; transition:background .25s ease, color .25s ease, border-color .25s ease;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+  body{
+    margin:0; min-height:100%; background:var(--paper); color:var(--ink);
+    font-family:var(--font-body);
+  }
+  body[data-direction="zine"]{
+    background-image: radial-gradient(rgba(128,110,80,.12) 1px, transparent 1px);
+    background-size:14px 14px;
+  }
+
+  /* ===== controls (vertical dock, right edge) ===== */
+  #controls{
+    position:fixed; top:50%; right:14px; transform:translateY(-50%); z-index:20;
+  }
+  .dock{
+    display:flex; flex-direction:column; align-items:stretch; gap:4px;
+    background:var(--card); border:2px solid var(--ink); border-radius:16px;
+    padding:8px; box-shadow:4px 4px 0 var(--shadow);
+  }
+  .dock-label{
+    font-family:var(--font-meta); font-size:.6rem; text-transform:uppercase; letter-spacing:1px;
+    text-align:center; opacity:.5; padding:2px 0 4px;
+  }
+  .dir-btn{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    width:64px; padding:8px 4px; border-radius:10px; border:none; background:transparent;
+    color:var(--ink); cursor:pointer;
+  }
+  .dir-btn .ic{ font-family:var(--font-meta); font-weight:800; font-size:.85rem; }
+  .dir-btn .lbl{ font-size:.6rem; font-weight:600; opacity:.75; }
+  .dir-btn.active{ background:var(--accent); color:#fff; }
+  .dir-btn.active .lbl{ opacity:1; color:#fff; }
+  .dock-divider{ height:1px; background:var(--ink); opacity:.2; margin:4px 6px; }
+  #themeToggle{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    width:64px; padding:8px 4px; border-radius:10px; border:none; background:transparent;
+    color:var(--ink); cursor:pointer; font-size:1rem;
+  }
+  #themeToggle .lbl{ font-size:.6rem; font-weight:600; opacity:.75; }
+
+  /* ===== header ===== */
+  header{ padding:22px 16px 0; text-align:center; }
+  header .logo{ display:inline-block; font-family:var(--font-head); font-weight:900; font-size:1.5rem; }
+  body[data-direction="zine"] header .logo{
+    transform:rotate(-2deg); background:var(--accent2); color:#fff; padding:5px 16px;
+    box-shadow:5px 5px 0 var(--shadow);
+  }
+  body[data-direction="editorial"] header .logo{
+    letter-spacing:-1px; border-bottom:4px solid var(--accent); padding-bottom:2px;
+  }
+  body[data-direction="terminal"] header .logo{
+    font-family:var(--font-meta); font-size:1.3rem;
+  }
+  body[data-direction="terminal"] header .logo::before{ content:"$ "; color:var(--accent); }
+
+  header .sub{ font-size:.72rem; opacity:.6; margin-top:8px; font-family:var(--font-meta); }
+  .stamp{
+    display:inline-block; margin-top:10px; font-family:var(--font-meta); font-size:.7rem;
+    padding:4px 10px; border:1.5px dashed var(--ink); border-radius:20px; opacity:.85;
+  }
+  body[data-direction="terminal"] .stamp{ border-radius:4px; border-style:solid; }
+
+  /* ===== tabs ===== */
+  .tabs{ display:flex; justify-content:center; gap:8px; margin:18px 0 6px; }
+  .tab{
+    font-family:var(--font-meta); font-size:.78rem; font-weight:700;
+    padding:8px 16px; background:var(--card); color:var(--ink);
+    border:2px solid var(--ink); border-bottom:none;
+    border-radius:8px 8px 0 0; cursor:pointer; opacity:.55;
+  }
+  .tab.active{ opacity:1; background:var(--paper); position:relative; top:2px; }
+
+  .page{ display:none; padding:14px 90px 60px 16px; max-width:640px; margin:0 auto; }
+  .page.active{ display:block; }
+
+  /* ===== week nav ===== */
+  .weekstrip{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--card); border:2px solid var(--ink); border-radius:4px;
+    padding:10px 16px; margin-bottom:22px; box-shadow:4px 4px 0 var(--shadow);
+  }
+  .weekstrip button{
+    width:32px; height:32px; border-radius:50%; border:2px solid var(--ink);
+    background:var(--accent2); color:#fff; font-weight:900; font-size:1rem; cursor:pointer;
+  }
+  .weekstrip .wk{ font-family:var(--font-head); font-weight:900; font-size:1.1rem; }
+  body[data-direction="terminal"] .weekstrip .wk{ font-family:var(--font-meta); }
+  body[data-direction="terminal"] .weekstrip button{ border-radius:4px; background:var(--accent); }
+
+  /* ===== day + sessions (base = zine post-it) ===== */
+  .day{ margin-bottom:26px; }
+  .day h2{ font-family:var(--font-head); font-size:1.1rem; display:inline-block;
+    border-bottom:3px solid var(--accent); padding-bottom:2px; margin-bottom:12px; }
+
+  .sticky{
+    position:relative; background:var(--card); border:2px solid var(--ink); border-radius:2px;
+    padding:10px 12px; margin-bottom:14px; box-shadow:5px 5px 0 var(--shadow);
+  }
+  .sticky:nth-child(odd){ transform:rotate(-1deg); }
+  .sticky:nth-child(even){ transform:rotate(1.2deg); margin-left:18px; }
+  .washi{ position:absolute; width:60px; height:18px; top:-9px; left:50%;
+    transform:translateX(-50%) rotate(-3deg); opacity:.7; }
+  .sticky .time{ font-family:var(--font-meta); font-size:.68rem; opacity:.65; }
+  .sticky .course{ font-size:1rem; font-weight:800; margin:3px 0 4px; font-family:var(--font-head); }
+  .taglabel{ display:inline-block; font-size:.62rem; font-weight:800; text-transform:uppercase;
+    padding:2px 8px; border-radius:3px; color:#fff; margin-top:6px; }
+  .empty{ font-size:.8rem; opacity:.45; font-style:italic; padding-left:4px; }
+
+  /* --- editorial override: row list, no tilt, no washi --- */
+  body[data-direction="editorial"] .sticky{
+    transform:none; margin-left:0; box-shadow:none; border:none; border-radius:0;
+    border-bottom:1px solid var(--ink); border-left:4px solid var(--accent);
+    padding:10px 0 10px 12px; background:transparent;
+  }
+  body[data-direction="editorial"] .washi{ display:none; }
+  body[data-direction="editorial"] .day h2{ font-size:1.4rem; }
+
+  /* --- terminal override: console line --- */
+  body[data-direction="terminal"] .sticky{
+    transform:none; margin-left:0; box-shadow:none; border:1px solid var(--accent2);
+    border-radius:4px; background:var(--card); font-family:var(--font-meta);
+  }
+  body[data-direction="terminal"] .washi{ display:none; }
+  body[data-direction="terminal"] .sticky .time::before{ content:"> "; color:var(--accent); }
+  body[data-direction="terminal"] .sticky .course{ font-family:var(--font-meta); font-weight:700; }
+  body[data-direction="terminal"] .day h2{ font-family:var(--font-meta); border-bottom-style:dashed; }
+  body[data-direction="terminal"] .day h2::before{ content:"# "; color:var(--accent); }
+
+  /* ===== documents page ===== */
+  .matiere-chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .mchip{ flex:0 0 auto; font-family:var(--font-meta); font-size:.75rem; font-weight:700;
+    padding:7px 12px; background:var(--card); color:var(--ink);
+    border:2px solid var(--ink); border-radius:6px; cursor:pointer; }
+  .mchip.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  .filters{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; }
+  .fchip{ font-size:.68rem; font-weight:700; padding:4px 10px; border-radius:999px;
+    border:1.5px solid var(--ink); background:transparent; color:var(--ink); cursor:pointer; }
+  .fchip.active{ background:var(--ink); color:var(--paper); }
+
+  .doc-card{ position:relative; background:var(--card); border:2px solid var(--ink); border-radius:3px;
+    padding:12px 14px; margin-bottom:14px; box-shadow:4px 4px 0 var(--shadow); }
+  .doc-card:nth-child(even){ transform:rotate(.8deg); }
+  .doc-card:nth-child(odd){ transform:rotate(-.6deg); }
+  .doc-card .dtitle{ font-family:var(--font-head); font-weight:800; font-size:1rem; margin-bottom:4px; }
+  .doc-card .dmeta{ font-family:var(--font-meta); font-size:.68rem; opacity:.6; }
+  .doc-card .taglabel{ float:right; }
+
+  body[data-direction="editorial"] .doc-card{ transform:none; box-shadow:none; border:none;
+    border-bottom:1px solid var(--ink); border-radius:0; padding:12px 0; }
+  body[data-direction="terminal"] .doc-card{ transform:none; box-shadow:none;
+    border:1px solid var(--accent2); border-radius:4px; }
+  body[data-direction="terminal"] .doc-card .dtitle{ font-family:var(--font-meta); }
+
+   footer{ text-align:center; font-size:.68rem; opacity:.4; padding:20px; font-family:var(--font-meta); }
+
+  @media (max-width: 640px) {
+    .page { padding: 14px 16px 90px 16px; }
+    #controls {
+      top: auto; bottom: 14px; right: 50%; transform: translateX(50%);
+    }
+    .dock {
+      flex-direction: row; align-items: center; border-radius: 30px; padding: 4px 10px;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+    .dock-label { display: none; }
+    .dock-divider { width: 1px; height: 20px; margin: 0 4px; }
+    .dir-btn { width: auto; padding: 6px 10px; flex-direction: row; }
+    .dir-btn .lbl { display: none; }
+    #themeToggle { width: auto; padding: 6px 10px; }
+    #themeToggle .lbl { display: none; }
+  }
+</style>
+</head>
+<body data-direction="zine">
+
+<div id="controls">
+  <div class="dock">
+    <div class="dock-label">Style</div>
+    <button class="dir-btn" data-dir="editorial" title="Éditorial Technique">
+      <span class="ic">Éd</span><span class="lbl">Éditorial</span>
+    </button>
+    <button class="dir-btn" data-dir="terminal" title="Terminal / Blueprint">
+      <span class="ic">Tm</span><span class="lbl">Terminal</span>
+    </button>
+    <button class="dir-btn active" data-dir="zine" title="Zine Étudiant">
+      <span class="ic">Zn</span><span class="lbl">Zine</span>
+    </button>
+    <div class="dock-divider"></div>
+    <button id="themeToggle" title="Thème clair / sombre">
+      <span id="themeIcon">🌙</span><span class="lbl">Thème</span>
+    </button>
+  </div>
+</div>
+
+<header>
+  <div class="logo">GESI3</div>
+  <div class="sub">ENSA FÈS · S5 · 2026/2027</div>
+  <div class="stamp"><span id="todayDate"></span> · Semaine <span id="stampWeek">3</span></div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-page="planning" data-label-key="planning">📌 Planning</div>
+  <div class="tab" data-page="docs" data-label-key="docs">📎 Documents</div>
+</div>
+
+<!-- ===== PAGE 1 : PLANNING ===== -->
+<div class="page active" id="planning">
+  <div class="weekstrip">
+    <button id="prevWk">‹</button>
+    <div class="wk"><span id="wkLabel">Semaine 3</span></div>
+    <button id="nextWk">›</button>
+  </div>
+
+  <div class="day">
+    <h2>Lundi</h2>
+    <div class="sticky">
+      <div class="washi" style="background:rgba(224,85,60,.5)"></div>
+      <div class="time">08h30–12h30 · Salle 1.6 · Pr. Salhi</div>
+      <div class="course">Véhicule Électrique</div>
+      <span class="taglabel" style="background:var(--accent2)">Cours</span>
+    </div>
+    <div class="sticky">
+      <div class="washi" style="background:rgba(92,138,90,.5)"></div>
+      <div class="time">14h30–18h30 · Atelier Électrotechnique</div>
+      <div class="course">Gestion d'Énergie (TP Gr2)</div>
+      <span class="taglabel" style="background:var(--accent2)">TP</span><br>
+      <span class="taglabel" style="background:var(--accent)">Reporté au 12/11</span>
+    </div>
+  </div>
+
+  <div class="day">
+    <h2>Mardi</h2>
+    <div class="sticky">
+      <div class="washi" style="background:rgba(77,126,168,.5)"></div>
+      <div class="time">14h30–18h30 · Salle 0.2 · Pr. J. El Haini</div>
+      <div class="course">Efficacité et Audit Énergétique</div>
+      <span class="taglabel" style="background:var(--accent2)">Cours+TD</span>
+    </div>
+  </div>
+
+  <div class="day">
+    <h2>Mercredi</h2>
+    <div class="empty">Pas de cours cette semaine</div>
+  </div>
+</div>
+
+<!-- ===== PAGE 2 : DOCUMENTS ===== -->
+<div class="page" id="docs">
+  <div class="matiere-chips">
+    <div class="mchip active">Smart Grids</div>
+    <div class="mchip">Véhicule</div>
+    <div class="mchip">Énergie Multisources</div>
+    <div class="mchip">Confort / Dimensionnement</div>
+    <div class="mchip">Langues</div>
+    <div class="mchip">Management</div>
+    <div class="mchip">Audit Énergétique</div>
+  </div>
+
+  <div class="filters">
+    <div class="fchip active">Tous</div>
+    <div class="fchip">Cours</div>
+    <div class="fchip">TD</div>
+    <div class="fchip">Correction TD</div>
+    <div class="fchip">TP</div>
+    <div class="fchip">Autre</div>
+  </div>
+
+  <div class="doc-card">
+    <span class="taglabel" style="background:var(--accent2)">Cours</span>
+    <div class="dtitle">Smart Grids — Chapitre 1</div>
+    <div class="dmeta">PDF · 2.4 Mo · ajouté le 03/10/2026</div>
+  </div>
+  <div class="doc-card">
+    <span class="taglabel" style="background:var(--accent2)">TD</span>
+    <div class="dtitle">TD Smart Grids n°2</div>
+    <div class="dmeta">PDF · 640 Ko · ajouté le 10/10/2026</div>
+  </div>
+  <div class="doc-card">
+    <span class="taglabel" style="background:var(--accent)">Correction TD</span>
+    <div class="dtitle">Correction TD n°2</div>
+    <div class="dmeta">PDF · 480 Ko · ajouté le 12/10/2026</div>
+  </div>
+</div>
+
+<footer id="footerLabel">maquette UI — direction "Zine Étudiant"</footer>
+
+<script>
+const PALETTES = {
+  zine: {
+    light:{ paper:"#fff7e8", card:"#ffffff", ink:"#241b12", accent:"#e0553c", accent2:"#5c8a5a", shadow:"rgba(36,27,18,.9)" },
+    dark: { paper:"#1b140d", card:"#2a2018", ink:"#f3e9d5", accent:"#ff8266", accent2:"#8fc088", shadow:"rgba(0,0,0,.55)" }
+  },
+  editorial: {
+    light:{ paper:"#f3efe6", card:"#fffdf9", ink:"#1a1a17", accent:"#b23b2e", accent2:"#5c6b4a", shadow:"rgba(26,26,23,.85)" },
+    dark: { paper:"#17150f", card:"#211f19", ink:"#f0ece0", accent:"#e2685a", accent2:"#8aa06e", shadow:"rgba(0,0,0,.6)" }
+  },
+  terminal: {
+    light:{ paper:"#eef2f0", card:"#ffffff", ink:"#0c2b22", accent:"#1f8f6b", accent2:"#2f6fed", shadow:"rgba(12,43,34,.8)" },
+    dark: { paper:"#081014", card:"#0f1c18", ink:"#c9f5e0", accent:"#4fd6a8", accent2:"#7bb0df", shadow:"rgba(0,0,0,.6)" }
+  }
+};
+
+const LABELS = {
+  zine: { planning:"📌 Planning", docs:"📎 Documents", footer:'maquette UI — direction "Zine Étudiant"' },
+  editorial: { planning:"01 — Planning", docs:"02 — Documents", footer:'maquette UI — direction "Éditorial Technique"' },
+  terminal: { planning:"&gt; planning", docs:"&gt; docs", footer:'maquette UI — direction "Terminal / Blueprint"' }
+};
+
+let direction = "zine";
+let mode = "light";
+const root = document.documentElement;
+const body = document.body;
+
+function applyPalette(){
+  const p = PALETTES[direction][mode];
+  root.style.setProperty("--paper", p.paper);
+  root.style.setProperty("--card", p.card);
+  root.style.setProperty("--ink", p.ink);
+  root.style.setProperty("--accent", p.accent);
+  root.style.setProperty("--accent2", p.accent2);
+  root.style.setProperty("--shadow", p.shadow);
+}
+
+function applyDirection(){
+  body.setAttribute("data-direction", direction);
+  document.querySelectorAll(".dir-btn").forEach(b => b.classList.toggle("active", b.dataset.dir === direction));
+  const L = LABELS[direction];
+  document.querySelector('[data-page="planning"]').innerHTML = L.planning;
+  document.querySelector('[data-page="docs"]').innerHTML = L.docs;
+  document.getElementById("footerLabel").textContent = L.footer;
+  applyPalette();
+}
+
+document.querySelectorAll(".dir-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    direction = btn.dataset.dir;
+    applyDirection();
+  });
+});
+
+const themeBtn = document.getElementById("themeToggle");
+const themeIcon = document.getElementById("themeIcon");
+function applyMode(m, persist){
+  mode = m;
+  themeIcon.textContent = mode === "dark" ? "☀️" : "🌙";
+  applyPalette();
+  if(persist){ try{ localStorage.setItem("gesi3-mode", mode); }catch(e){} }
+}
+themeBtn.addEventListener("click", () => applyMode(mode === "dark" ? "light" : "dark", true));
+
+let savedMode = null;
+try{ savedMode = localStorage.getItem("gesi3-mode"); }catch(e){}
+if(savedMode === "dark" || savedMode === "light"){
+  applyMode(savedMode, false);
+} else {
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  applyMode(prefersDark ? "dark" : "light", false);
+}
+applyDirection();
+
+/* tabs */
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    tab.classList.add("active");
+    document.getElementById(tab.dataset.page).classList.add("active");
+  });
+});
+document.querySelectorAll(".mchip").forEach(c => {
+  c.addEventListener("click", () => {
+    document.querySelectorAll(".mchip").forEach(x => x.classList.remove("active"));
+    c.classList.add("active");
+  });
+});
+document.querySelectorAll(".fchip").forEach(c => {
+  c.addEventListener("click", () => {
+    document.querySelectorAll(".fchip").forEach(x => x.classList.remove("active"));
+    c.classList.add("active");
+  });
+});
+
+/* date + week */
+const today = new Date();
+document.getElementById("todayDate").textContent = today.toLocaleDateString("fr-FR");
+
+let week = 3;
+function updateWeek(){
+  document.getElementById("wkLabel").textContent = "Semaine " + week;
+  document.getElementById("stampWeek").textContent = week;
+}
+document.getElementById("prevWk").addEventListener("click", () => { if(week > 1){ week--; updateWeek(); } });
+document.getElementById("nextWk").addEventListener("click", () => { if(week < 11){ week++; updateWeek(); } });
+updateWeek();
+</script>
+
+</body>
+</html>
