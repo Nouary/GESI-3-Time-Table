@@ -1,0 +1,240 @@
+/* Map these to your own design tokens so the intro follows the active theme. */
+.intro {
+  --intro-bg: var(--bg, var(--paper, #f3f5f7));
+  --intro-fg: var(--ink, #14202b);
+  --intro-muted: var(--muted, #5d6b78);
+  --intro-accent: var(--accent, #1f6f8b);
+
+  --k-ok: #2f9e6b;
+  --k-cancel: #d64545;
+  --k-report: #3b7bd6;
+  --k-makeup: #e0a020;
+
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--intro-bg);
+  color: var(--intro-fg);
+  font-family: var(--font-body, inherit);
+  transition: opacity 0.4s ease;
+}
+.intro.is-leaving { opacity: 0; pointer-events: none; }
+
+.intro__skip {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  border: 1.5px solid var(--intro-fg);
+  border-radius: 999px;
+  background: var(--intro-bg);
+  color: var(--intro-fg);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--shadow, rgba(0, 0, 0, 0.2));
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.intro__skip:hover {
+  transform: translateY(-1px);
+  box-shadow: 3px 3px 0 var(--shadow, rgba(0, 0, 0, 0.3));
+}
+
+.intro__stage {
+  width: min(740px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.intro__visual {
+  min-height: 250px;
+  display: grid;
+  align-items: center;
+}
+
+/* ---------- timetable ---------- */
+.intro__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-auto-rows: 64px;
+  grid-template-rows: auto;
+  gap: 8px;
+}
+.intro__day {
+  font-size: 0.8rem;
+  font-weight: 800;
+  font-family: var(--font-meta, monospace);
+  color: var(--intro-muted);
+  text-transform: uppercase;
+  padding: 0 2px 2px;
+}
+.intro__slot {
+  border-radius: 6px;
+  border: 1px dashed color-mix(in srgb, var(--intro-fg) 15%, transparent);
+  background: color-mix(in srgb, var(--intro-fg) 4%, transparent);
+}
+.intro__cell {
+  --k: var(--k-ok);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1.5px solid var(--intro-fg);
+  border-left: 5px solid var(--k);
+  background: var(--card, #ffffff);
+  box-shadow: 2px 2px 0 var(--shadow, rgba(0, 0, 0, 0.15));
+  font-size: 0.72rem;
+  line-height: 1.25;
+  overflow: hidden;
+  animation: intro-pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(var(--i) * 45ms);
+  transition: background-color 0.5s ease, border-color 0.5s ease;
+}
+.intro__name {
+  font-weight: 700;
+}
+.intro__cell[data-kind='cancel'] { --k: var(--k-cancel); }
+.intro__cell[data-kind='report'] { --k: var(--k-report); }
+.intro__cell[data-kind='makeup'] { --k: var(--k-makeup); }
+.intro__cell[data-kind='cancel'] .intro__name { text-decoration: line-through; opacity: 0.6; }
+
+.intro__badge {
+  max-height: 0;
+  opacity: 0;
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--k);
+  transition: opacity 0.4s ease 0.3s, max-height 0.4s ease 0.3s;
+}
+.is-changed .intro__badge { max-height: 2.6em; opacity: 1; }
+
+/* ---------- features ---------- */
+.intro__features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+.intro__features li {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border: 2px solid var(--intro-fg);
+  background: var(--card, #ffffff);
+  box-shadow: 3px 3px 0 var(--shadow, rgba(0, 0, 0, 0.2));
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--intro-muted);
+  animation: intro-pop 0.45s ease both;
+  animation-delay: calc(var(--i) * 120ms);
+}
+.intro__features svg { color: var(--intro-accent); }
+.intro__features strong { color: var(--intro-fg); font-size: 1.05rem; font-family: var(--font-head, inherit); }
+
+/* ---------- final mark ---------- */
+.intro__mark {
+  display: grid;
+  place-items: center;
+  color: var(--intro-accent);
+  animation: intro-pop 0.5s ease both;
+}
+
+/* ---------- caption / footer ---------- */
+.intro__caption { animation: intro-fade 0.5s ease both; }
+.intro__caption h1 {
+  margin: 0 0 8px;
+  font-family: var(--font-head, inherit);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 5vw, 2.3rem);
+  line-height: 1.15;
+}
+.intro__caption p {
+  margin: 0;
+  max-width: 52ch;
+  color: var(--intro-muted);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.intro__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+}
+.intro__dots { display: flex; gap: 8px; }
+.intro__dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 1px solid var(--intro-fg);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--intro-fg) 20%, transparent);
+  cursor: pointer;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+.intro__dots button.is-on {
+  width: 30px;
+  border-radius: 999px;
+  background: var(--intro-accent);
+  border-color: var(--intro-accent);
+}
+
+.intro__enter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border: 2px solid var(--intro-fg);
+  border-radius: 8px;
+  background: var(--intro-accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--shadow, rgba(0, 0, 0, 0.3));
+  animation: intro-fade 0.4s ease both;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.intro__enter:hover {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 var(--shadow, rgba(0, 0, 0, 0.4));
+}
+.intro button:focus-visible {
+  outline: 2px solid var(--intro-accent);
+  outline-offset: 3px;
+}
+
+@keyframes intro-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes intro-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 560px) {
+  .intro__grid { grid-auto-rows: 58px; gap: 4px; }
+  .intro__cell { padding: 4px 5px; font-size: 0.6rem; }
+  .intro__features { grid-template-columns: 1fr; }
+  .intro__features li { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .intro__features span { flex-basis: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro *, .intro { animation: none !important; transition: none !important; }
+}
+
+@media print { .intro { display: none !important; } }

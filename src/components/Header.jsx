@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Header({ week }) {
+export default function Header({ week, onReplayIntro }) {
   const today = new Date().toLocaleDateString('fr-FR', {
     day: '2-digit',
     month: '2-digit',
@@ -26,6 +26,17 @@ export default function Header({ week }) {
           <span>·</span>
           <span>Semaine {week}</span>
         </div>
+        {onReplayIntro && (
+          <button
+            type="button"
+            className="header-pdf-btn"
+            onClick={onReplayIntro}
+            title="Revoir la présentation animée du site"
+            style={{ marginRight: 6 }}
+          >
+            🎬 Intro
+          </button>
+        )}
         <button
           type="button"
           className="header-pdf-btn"

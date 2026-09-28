@@ -8,6 +8,7 @@ import DocumentsView from './components/DocumentsView';
 import ProjectsView from './components/ProjectsView';
 import AdminView from './components/AdminView';
 import Footer from './components/Footer';
+import IntroAnimation, { introSeen } from './components/IntroAnimation';
 import {
   getModules,
   getSessions,
@@ -41,6 +42,7 @@ function calculateCurrentWeek() {
 }
 
 function MainApp() {
+  const [showIntro, setShowIntro] = useState(() => !introSeen());
   const [activeTab, setActiveTab] = useState('planning');
   const [week, setWeek] = useState(() => calculateCurrentWeek());
 
@@ -182,8 +184,18 @@ function MainApp() {
 
   return (
     <>
+      {showIntro && (
+        <IntroAnimation
+          onDone={() => {
+            setShowIntro(false);
+            setWeek(calculateCurrentWeek());
+            setActiveTab('planning');
+          }}
+        />
+      )}
+
       <ControlsDock />
-      <Header week={week} />
+      <Header week={week} onReplayIntro={() => setShowIntro(true)} />
 
       <TabsNav activeTab={activeTab} onSelectTab={setActiveTab} projectsCount={projects.length} />
 
