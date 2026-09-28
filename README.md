@@ -1,6 +1,12 @@
 # GESI3 — Emploi du Temps Interactif & Partage de Documents
 **Promotion GESI 3ème année — Semestre 5 (2026/2027) — ENSA Fès**
 
+> 💡 **Note de l'auteur :**  
+> Ce site web a été créé bénévolement dans le but d'aider à organiser et simplifier la vie étudiante de la classe GESI 3.  
+> Il s'agit d'un projet personnel (*side project*) développé avec l'aide de l'IA sur mon temps libre.  
+> **Créé par :** NOUARY Lhoussaine  
+> **Date :** 28 Septembre 2026
+
 Application web moderne, réactive et multi-styles conçue pour la classe GESI3 :
 1. **Emploi du temps interactif** : navigation fluide par semaine (Semaines 1 à 11), gestion visuelle des séances régulières, des **séances reportées**, des **séances annulées** et injection des **créneaux de rattrapage**.
 2. **Partage de documents** : cours, TD, corrections, TP classés par matière avec téléchargement direct.
